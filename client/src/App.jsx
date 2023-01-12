@@ -1,13 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./App.css";
-import { UserContext } from "./contexts/UserContext";
-import { io } from "socket.io-client";
 import Navbar from "./components/navbar/Navbar";
+import { UserContext } from "./contexts/UserContext";
+import "./App.css";
 
-const socket = io("http://127.0.0.1:8080");
-
-const App = () => {
+const App = ({ socket }) => {
   const navigate = useNavigate();
   const { user } = useContext(UserContext);
   const [messages, setMessages] = useState([]);

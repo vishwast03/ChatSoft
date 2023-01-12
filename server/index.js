@@ -14,15 +14,10 @@ const io = new Server(server, {
 
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello world</h1>");
-});
-
 io.on("connection", (socket) => {
   console.log("a user connected");
 
   socket.on("chat message", (msg) => {
-    console.log("message: " + msg);
     io.emit("chat message", msg);
   });
 
