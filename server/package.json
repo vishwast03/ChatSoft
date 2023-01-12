@@ -1,0 +1,20 @@
+{
+  "name": "chatsoft-server",
+  "version": "0.0.0",
+  "description": "A real-time multi-client chat application.",
+  "main": "index.js",
+  "scripts": {
+    "serve": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "Vishwas Tyagi",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

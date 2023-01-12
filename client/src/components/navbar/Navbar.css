@@ -1,0 +1,21 @@
+.navbar {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f3f4f6;
+}
+.navbar_logo {
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.navbar_logo img {
+  height: 6vmin;
+}
+.navbar_logo span {
+  font-size: 3vmin;
+  font-weight: bold;
+  color: #3b67b0;
+}
