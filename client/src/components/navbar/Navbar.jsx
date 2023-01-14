@@ -3,7 +3,7 @@ import "./Navbar.css";
 const Navbar = () => {
   return (
     <div className="navbar">
-      <div className="navbar_logo">
+      <div className="navbar__logo">
         <img src="/logo.png" />
         <span>ChatSoft</span>
       </div>

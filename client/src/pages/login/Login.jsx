@@ -4,7 +4,7 @@ import Navbar from "../../components/navbar/Navbar";
 import { UserContext } from "../../contexts/UserContext";
 import "./Login.css";
 
-const Login = () => {
+const Login = ({ socket }) => {
   const navigate = useNavigate();
   const { setUsername } = useContext(UserContext);
   const [name, setName] = useState("");
@@ -13,15 +13,16 @@ const Login = () => {
     e.preventDefault();
 
     setUsername(name);
+    socket.emit("newUser", { username: name, socketID: socket.id });
     navigate("/");
   };
 
   return (
     <div className="login">
       <Navbar />
-      <div className="login_container">
+      <div className="login__container">
         <h2>Enter username to continue</h2>
-        <form className="login_form" onSubmit={handleSubmit}>
+        <form className="login__form" onSubmit={handleSubmit}>
           <input
             type="text"
             name="username"
@@ -33,7 +34,7 @@ const Login = () => {
             }}
           />
 
-          <input type="submit" value="Submit" id="login_submitBtn" />
+          <input type="submit" value="Submit" id="login__submitBtn" />
         </form>
       </div>
     </div>

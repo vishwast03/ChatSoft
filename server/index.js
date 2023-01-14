@@ -14,15 +14,25 @@ const io = new Server(server, {
 
 app.use(cors());
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
+let users = [];
 
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg);
+io.on("connection", (socket) => {
+  console.log("a user connected " + socket.id);
+
+  socket.on("newUser", (data) => {
+    users.push(data);
+    io.emit("newUserResponse", users);
+  });
+
+  socket.on("message", (data) => {
+    io.emit("messageResponse", data);
   });
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
+    users = users.filter((user) => user.socketID !== socket.id);
+    io.emit("newUserResponse", users);
+    socket.disconnect();
   });
 });
 

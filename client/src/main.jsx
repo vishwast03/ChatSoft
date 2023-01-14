@@ -6,6 +6,7 @@ import App from "./App";
 import Login from "./pages/login/Login";
 import { UserProvider } from "./contexts/UserContext";
 import "./index.css";
+import Error from "./pages/error/Error";
 
 const socket = io("http://127.0.0.1:8080");
 
@@ -13,10 +14,12 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App socket={socket} />,
+    errorElement: <Error />,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <Login socket={socket} />,
+    errorElement: <Error />,
   },
 ]);
 
