@@ -34,7 +34,11 @@ const Chat = ({ socket }) => {
         ))}
         <div ref={lastMessageRef}></div>
       </div>
-      <ChatFooter socket={socket} />
+      <ChatFooter
+        socket={socket}
+        messages={messages}
+        setMessages={setMessages}
+      />
     </div>
   );
 };

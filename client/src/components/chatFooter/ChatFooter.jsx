@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { UserContext } from "../../contexts/UserContext";
 import "./ChatFooter.css";
 
-const ChatFooter = ({ socket }) => {
+const ChatFooter = ({ socket, messages, setMessages }) => {
   const { user } = useContext(UserContext);
   const [message, setMessage] = useState("");
 
@@ -11,12 +11,16 @@ const ChatFooter = ({ socket }) => {
     e.preventDefault();
 
     if (message.trim()) {
-      socket.emit("message", {
+      const messageData = {
         text: message,
         username: user.username,
         id: nanoid(),
         socketID: socket.id,
-      });
+      };
+
+      setMessages([...messages, messageData]);
+
+      socket.emit("message", messageData);
       setMessage("");
     }
   };
