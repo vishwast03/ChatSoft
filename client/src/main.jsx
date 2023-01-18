@@ -4,9 +4,12 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { io } from "socket.io-client";
 import App from "./App";
 import Login from "./pages/login/Login";
-import { UserProvider } from "./contexts/UserContext";
-import "./index.css";
 import Error from "./pages/error/Error";
+import Index from "./components/index/Index";
+import Chat from "./components/chat/Chat";
+import { UserProvider } from "./contexts/UserContext";
+import { ActiveUsersProvider } from "./contexts/ActiveUsersContext";
+import "./index.css";
 
 const socket = io("http://127.0.0.1:8080");
 
@@ -15,6 +18,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <App socket={socket} />,
     errorElement: <Error />,
+    children: [
+      { index: true, element: <Index /> },
+      { path: "/:selectedSocketID", element: <Chat socket={socket} /> },
+    ],
   },
   {
     path: "/login",
@@ -26,7 +33,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <UserProvider>
-      <RouterProvider router={router} />
+      <ActiveUsersProvider>
+        <RouterProvider router={router} />
+      </ActiveUsersProvider>
     </UserProvider>
   </React.StrictMode>
 );

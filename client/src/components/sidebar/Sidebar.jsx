@@ -1,27 +1,28 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
+import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
 import "./Sidebar.css";
 
 const Sidebar = ({ socket }) => {
-  const [activeUsers, setActiveUsers] = useState([]);
-
-  useEffect(() => {
-    socket.on("newUserResponse", (users) => {
-      setActiveUsers(users);
-    });
-  }, [socket, activeUsers]);
+  const { activeUsers } = useContext(ActiveUsersContext);
 
   return (
     <div className="sidebar">
       <h2 className="sidebar__header">Active Users</h2>
 
-      <ul className="sidebar__userList">
+      <div className="sidebar__userList">
         {activeUsers.map((user) => (
-          <li key={user.socketID}>{`${user.username} ${
-            user.socketID === socket.id ? "(You)" : ""
-          }`}</li>
+          <Link key={user.socketID} to={user.socketID}>
+            {`${user.username} ${user.socketID === socket.id ? "(You)" : ""}`}
+            <span
+              className="sidebar__connectionStatus"
+              style={user.isConnected ? { color: "green" } : { color: "red" }}
+            >
+              ●
+            </span>
+          </Link>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

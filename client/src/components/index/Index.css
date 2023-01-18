@@ -1,0 +1,19 @@
+.index__container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10vmin;
+}
+.index__container img {
+  height: 20vmin;
+}
+.index__container h2 {
+  font-size: 5vmin;
+  color: #1f2937;
+  margin-bottom: 1.5vmin;
+}
+.index__container p {
+  color: #4b5563;
+  font-size: 2.5vmin;
+}

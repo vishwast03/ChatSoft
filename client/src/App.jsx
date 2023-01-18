@@ -1,28 +1,24 @@
 import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "./components/navbar/Navbar";
-import Sidebar from "./components/sidebar/Sidebar";
-import Chat from "./components/chat/Chat";
-import { UserContext } from "./contexts/UserContext";
+import Home from "./pages/home/Home";
+import { ActiveUsersContext } from "./contexts/ActiveUsersContext";
 import "./App.css";
 
 const App = ({ socket }) => {
-  const navigate = useNavigate();
-  const { user } = useContext(UserContext);
+  const { handleNewMessage } = useContext(ActiveUsersContext);
 
   useEffect(() => {
-    if (!user.username) {
-      navigate("/login");
-    }
+    socket.on("privateMessageResponse", ({ message, from }) => {
+      handleNewMessage(message, from);
+    });
+
+    return () => {
+      socket.off("privateMessageResponse");
+    };
   }, []);
 
   return (
     <div className="app">
-      <Navbar />
-      <div className="app__container">
-        <Sidebar socket={socket} />
-        <Chat socket={socket} />
-      </div>
+      <Home socket={socket} />
     </div>
   );
 };

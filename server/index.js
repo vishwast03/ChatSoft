@@ -18,20 +18,32 @@ let users = [];
 
 io.on("connection", (socket) => {
   console.log("a user connected " + socket.id);
+  socket.join(socket.id);
 
   socket.on("newUser", (data) => {
-    users.push(data);
-    io.emit("newUserResponse", users);
+    const newUser = {
+      ...data,
+      isConnected: true,
+      messages: [],
+    };
+    users.push(newUser);
+
+    socket.emit("users", users);
+
+    socket.broadcast.emit("newUserResponse", newUser);
   });
 
-  socket.on("message", (data) => {
-    socket.broadcast.emit("messageResponse", data);
+  socket.on("privateMessage", ({ message, to }) => {
+    socket.to(to).emit("privateMessageResponse", {
+      message: { ...message, fromSelf: false },
+      from: socket.id,
+    });
   });
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
     users = users.filter((user) => user.socketID !== socket.id);
-    io.emit("newUserResponse", users);
+    io.emit("userDisconnected", socket.id);
     socket.disconnect();
   });
 });
