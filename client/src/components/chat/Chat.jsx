@@ -4,7 +4,7 @@ import ChatFooter from "../chatFooter/ChatFooter";
 import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
 import "./Chat.css";
 
-const Chat = ({ socket }) => {
+const Chat = () => {
   const lastMessageRef = useRef(null);
   const { selectedSocketID } = useParams();
   const { activeUsers } = useContext(ActiveUsersContext);
@@ -40,7 +40,7 @@ const Chat = ({ socket }) => {
         ))}
         <div ref={lastMessageRef}></div>
       </div>
-      <ChatFooter socket={socket} selectedSocketID={selectedSocketID} />
+      <ChatFooter selectedSocketID={selectedSocketID} />
     </div>
   );
 };

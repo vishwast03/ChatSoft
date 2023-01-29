@@ -1,32 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { io } from "socket.io-client";
 import App from "./App";
 import Login from "./pages/login/Login";
 import Error from "./pages/error/Error";
 import Index from "./components/index/Index";
 import Chat from "./components/chat/Chat";
+import Signup from "./pages/signup/Signup";
 import { UserProvider } from "./contexts/UserContext";
 import { ActiveUsersProvider } from "./contexts/ActiveUsersContext";
+import { SocketProvider } from "./contexts/socket";
 import "./index.css";
-import Signup from "./pages/signup/Signup";
-
-const socket = io("http://127.0.0.1:8080");
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App socket={socket} />,
+    element: <App />,
     errorElement: <Error />,
     children: [
       { index: true, element: <Index /> },
-      { path: "/:selectedSocketID", element: <Chat socket={socket} /> },
+      { path: "/:selectedSocketID", element: <Chat /> },
     ],
   },
   {
     path: "/login",
-    element: <Login socket={socket} />,
+    element: <Login />,
     errorElement: <Error />,
   },
   { path: "/signup", element: <Signup />, errorElement: <Error /> },
@@ -34,10 +32,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <UserProvider>
-      <ActiveUsersProvider>
-        <RouterProvider router={router} />
-      </ActiveUsersProvider>
-    </UserProvider>
+    <SocketProvider>
+      <UserProvider>
+        <ActiveUsersProvider>
+          <RouterProvider router={router} />
+        </ActiveUsersProvider>
+      </UserProvider>
+    </SocketProvider>
   </React.StrictMode>
 );

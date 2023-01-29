@@ -1,11 +1,13 @@
 import { useContext, useState } from "react";
 import { nanoid } from "nanoid";
 import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
+import { SocketContext } from "../../contexts/socket";
 import "./ChatFooter.css";
 
-const ChatFooter = ({ socket, selectedSocketID }) => {
+const ChatFooter = ({ selectedSocketID }) => {
   const [message, setMessage] = useState("");
   const { handleNewMessage } = useContext(ActiveUsersContext);
+  const { socket } = useContext(SocketContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
+import { SocketContext } from "../../contexts/socket";
 import "./Sidebar.css";
 
-const Sidebar = ({ socket }) => {
+const Sidebar = () => {
   const { activeUsers } = useContext(ActiveUsersContext);
+  const { socket } = useContext(SocketContext);
 
   return (
     <div className="sidebar">
