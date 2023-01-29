@@ -10,6 +10,7 @@ import Chat from "./components/chat/Chat";
 import { UserProvider } from "./contexts/UserContext";
 import { ActiveUsersProvider } from "./contexts/ActiveUsersContext";
 import "./index.css";
+import Signup from "./pages/signup/Signup";
 
 const socket = io("http://127.0.0.1:8080");
 
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
     element: <Login socket={socket} />,
     errorElement: <Error />,
   },
+  { path: "/signup", element: <Signup />, errorElement: <Error /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
