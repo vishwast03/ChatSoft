@@ -1,32 +1,34 @@
 import { createContext } from "react";
 import { useImmer } from "use-immer";
+import axios from "../utils/axios";
 
 export const ActiveUsersContext = createContext();
 
 export const ActiveUsersProvider = (props) => {
   const [activeUsers, setActiveUsers] = useImmer([]);
 
-  const handleUsers = (users) => {
-    setActiveUsers([...users]);
+  const fetchUsers = () => {
+    const authToken = sessionStorage.getItem("auth-token--chatsoft");
+    axios
+      .get("/users/get", { headers: { "auth-token": authToken } })
+      .then(({ data }) => {
+        if (data.success) {
+          setActiveUsers(data.users);
+        }
+      });
   };
 
-  const handleNewUserRespone = (user) => {
-    setActiveUsers([...activeUsers, user]);
-  };
-
-  const disconnectUser = (disconnectedSocetID) => {
+  const handleUserConnected = (userId) => {
     setActiveUsers((draft) => {
-      const disconnectedUser = draft.find(
-        (user) => user.socketID === disconnectedSocetID
-      );
-      if (disconnectedUser) disconnectedUser.isConnected = false;
+      const connectedUser = draft.find((user) => user._id === userId);
+      if (connectedUser) connectedUser.isConnected = true;
     });
   };
 
-  const handleNewMessage = (message, socketID) => {
+  const handleUserDisconnected = (userId) => {
     setActiveUsers((draft) => {
-      const msgUser = draft.find((user) => user.socketID === socketID);
-      msgUser.messages.push(message);
+      const disconnectedUser = draft.find((user) => user._id === userId);
+      if (disconnectedUser) disconnectedUser.isConnected = false;
     });
   };
 
@@ -34,64 +36,12 @@ export const ActiveUsersProvider = (props) => {
     <ActiveUsersContext.Provider
       value={{
         activeUsers,
-        handleUsers,
-        handleNewUserRespone,
-        disconnectUser,
-        handleNewMessage,
+        fetchUsers,
+        handleUserConnected,
+        handleUserDisconnected,
       }}
     >
       {props.children}
     </ActiveUsersContext.Provider>
   );
 };
-
-/*
-activeUsers = [
-  {
-    username: "Wade Wilson",
-    socketID: "ldjfa843904j5",
-    isConnected: true,
-    hasNewMessages: true,
-    messages: [
-      {
-        text: "Hello",
-        id: "afsdfsdfasd9f",
-        fromSelf: false
-      },
-      {
-        text: "Hello",
-        id: "afsdf8ddsd9f"
-        fromSelf: true
-      },
-      {
-        text: "Hello",
-        id: "afsdwwasd9f"
-        fromSelf: false
-      },
-    ]
-  },
-  {
-    username: "Wade Wilson",
-    socketID: "ldjfa843904j5",
-    isConnected: false,
-    hasNewMessages: false,
-    messages: [
-      {
-        text: "Hello",
-        id: "afsdfsdfasd9f"
-        fromSelf: true
-      },
-      {
-        text: "Hello",
-        id: "afsdf8ddsd9f"
-        fromSelf: false
-      },
-      {
-        text: "Hello",
-        id: "afsdwwasd9f"
-        fromSelf: true
-      },
-    ]
-  },
-]
-*/

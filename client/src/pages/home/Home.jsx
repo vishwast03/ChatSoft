@@ -1,41 +1,47 @@
 import { useEffect, useContext } from "react";
 import { useNavigate, Outlet } from "react-router-dom";
+
 import Navbar from "../../components/navbar/Navbar";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
-import { SocketContext } from "../../contexts/socket";
+
+import { SocketContext } from "../../contexts/SocketContext";
 import { UserContext } from "../../contexts/UserContext";
+import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
+
 import "./Home.css";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user } = useContext(UserContext);
-  const { activeUsers, handleUsers, handleNewUserRespone, disconnectUser } =
-    useContext(ActiveUsersContext);
+
   const { socket } = useContext(SocketContext);
+  const { loginUser } = useContext(UserContext);
+  const {
+    activeUsers,
+    fetchUsers,
+    handleUserConnected,
+    handleUserDisconnected,
+  } = useContext(ActiveUsersContext);
 
   useEffect(() => {
-    if (!user.username) {
+    if (sessionStorage.getItem("auth-token--chatsoft")) {
+      loginUser();
+      fetchUsers();
+    } else {
       navigate("/login");
     }
   }, []);
 
   useEffect(() => {
-    socket.on("users", (users) => {
-      handleUsers(users);
+    socket.on("userConnected", (userId) => {
+      handleUserConnected(userId);
     });
 
-    socket.on("newUserResponse", (user) => {
-      handleNewUserRespone(user);
-    });
-
-    socket.on("userDisconnected", (disconnectedSocetID) => {
-      disconnectUser(disconnectedSocetID);
+    socket.on("userDisconnected", (userId) => {
+      handleUserDisconnected(userId);
     });
 
     return () => {
-      socket.off("users");
-      socket.off("newUserResponse");
+      socket.off("userConnected");
       socket.off("userDisconnected");
     };
   }, [socket, activeUsers]);
@@ -44,7 +50,7 @@ const Home = () => {
     <div className="home">
       <Navbar />
       <div className="home__container">
-        <Sidebar socket={socket} />
+        <Sidebar />
         <Outlet />
       </div>
     </div>

@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import axios from "../../utils/axios";
 import Navbar from "../../components/navbar/Navbar";
+
 import "./Signup.css";
 
 const Signup = () => {
-  const [emailError, setEmailError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
+  const navigate = useNavigate();
+
   const [inputData, setInputData] = useState({
     fullname: "",
     email: "",
     password: "",
     cpassword: "",
   });
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   const handleChange = (e) => {
     switch (e.target.name) {
@@ -46,6 +50,7 @@ const Signup = () => {
           setEmailError(true);
         } else {
           sessionStorage.setItem("auth-token--chatsoft", data.authToken);
+          navigate("/");
         }
       });
   };

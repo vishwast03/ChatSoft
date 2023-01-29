@@ -1,24 +1,89 @@
-import { useEffect, useState, useRef, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useContext } from "react";
+import { useLoaderData, useParams } from "react-router-dom";
+import { useImmer } from "use-immer";
+
+import axios from "../../utils/axios";
 import ChatFooter from "../chatFooter/ChatFooter";
+
+import { SocketContext } from "../../contexts/SocketContext";
 import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
+
 import "./Chat.css";
+
+export async function loader({ params }) {
+  const selectedUserId = params.selectedUserId;
+  const authToken = sessionStorage.getItem("auth-token--chatsoft");
+
+  const { data } = await axios.post(
+    "/chat/init",
+    { user_id: selectedUserId },
+    { headers: { "auth-token": authToken } }
+  );
+
+  return data.chat_id;
+}
 
 const Chat = () => {
   const lastMessageRef = useRef(null);
-  const { selectedSocketID } = useParams();
+
+  const { selectedUserId } = useParams();
+  const chatId = useLoaderData();
+
+  const { socket } = useContext(SocketContext);
   const { activeUsers } = useContext(ActiveUsersContext);
-  const [selectedUser, setSelectedUser] = useState({
-    username: "User",
+
+  const [selectedUser, setSelectedUser] = useImmer({
+    fullname: "User",
     messages: [],
   });
 
+  const fetchMessages = () => {
+    const authToken = sessionStorage.getItem("auth-token--chatsoft");
+    axios
+      .post(
+        "/chat/fetch",
+        { chat_id: chatId },
+        { headers: { "auth-token": authToken } }
+      )
+      .then(({ data }) => {
+        if (data.success) {
+          setSelectedUser((draft) => {
+            draft.messages = data.messages;
+          });
+        }
+      });
+  };
+
+  const handleSentMessage = (message) => {
+    setSelectedUser((draft) => {
+      draft.messages.push(message);
+    });
+  };
+
   useEffect(() => {
-    const slctUser = activeUsers.find(
-      (user) => user.socketID === selectedSocketID
-    );
-    setSelectedUser(slctUser);
-  }, [activeUsers, selectedSocketID]);
+    setSelectedUser((draft) => {
+      draft.messages = [];
+    });
+
+    const slctUser = activeUsers.find((user) => user._id === selectedUserId);
+    setSelectedUser((draft) => {
+      draft.fullname = slctUser.fullname;
+    });
+
+    fetchMessages();
+  }, [selectedUserId]);
+
+  useEffect(() => {
+    socket.on("privateMessageResponse", ({ message }) => {
+      setSelectedUser((draft) => {
+        draft.messages.push(message);
+      });
+    });
+
+    return () => {
+      socket.off("privateMessageResponse");
+    };
+  }, []);
 
   useEffect(() => {
     lastMessageRef.current?.scrollIntoView({ behaviour: "smooth" });
@@ -26,13 +91,15 @@ const Chat = () => {
 
   return (
     <div className="chat">
-      <div className="chat__header">{selectedUser.username}</div>
+      <div className="chat__header">{selectedUser.fullname}</div>
       <div className="chat__messageContainer">
-        {selectedUser.messages.map((message) => (
+        {selectedUser.messages.map((message, i) => (
           <div
-            key={message.id}
+            key={i}
             className={`chat__message ${
-              message.fromSelf ? "sentMessage" : "receivedMessage"
+              message.fromUserId === selectedUserId
+                ? "receivedMessage"
+                : "sentMessage"
             }`}
           >
             <p>{message.text}</p>
@@ -40,7 +107,11 @@ const Chat = () => {
         ))}
         <div ref={lastMessageRef}></div>
       </div>
-      <ChatFooter selectedSocketID={selectedSocketID} />
+      <ChatFooter
+        selectedUserId={selectedUserId}
+        chatId={chatId}
+        handleSentMessage={handleSentMessage}
+      />
     </div>
   );
 };

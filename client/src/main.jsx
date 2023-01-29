@@ -1,15 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import App from "./App";
 import Login from "./pages/login/Login";
 import Error from "./pages/error/Error";
 import Index from "./components/index/Index";
-import Chat from "./components/chat/Chat";
+import Chat, { loader as chatLoader } from "./components/chat/Chat";
 import Signup from "./pages/signup/Signup";
+
+import { SocketProvider } from "./contexts/SocketContext";
 import { UserProvider } from "./contexts/UserContext";
 import { ActiveUsersProvider } from "./contexts/ActiveUsersContext";
-import { SocketProvider } from "./contexts/socket";
+
 import "./index.css";
 
 const router = createBrowserRouter([
@@ -19,14 +22,10 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       { index: true, element: <Index /> },
-      { path: "/:selectedSocketID", element: <Chat /> },
+      { path: "/:selectedUserId", element: <Chat />, loader: chatLoader },
     ],
   },
-  {
-    path: "/login",
-    element: <Login />,
-    errorElement: <Error />,
-  },
+  { path: "/login", element: <Login />, errorElement: <Error /> },
   { path: "/signup", element: <Signup />, errorElement: <Error /> },
 ]);
 

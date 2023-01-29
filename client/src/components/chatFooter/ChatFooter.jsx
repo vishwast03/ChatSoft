@@ -1,13 +1,15 @@
 import { useContext, useState } from "react";
-import { nanoid } from "nanoid";
-import { ActiveUsersContext } from "../../contexts/ActiveUsersContext";
-import { SocketContext } from "../../contexts/socket";
+
+import { SocketContext } from "../../contexts/SocketContext";
+import { UserContext } from "../../contexts/UserContext";
+
 import "./ChatFooter.css";
 
-const ChatFooter = ({ selectedSocketID }) => {
-  const [message, setMessage] = useState("");
-  const { handleNewMessage } = useContext(ActiveUsersContext);
+const ChatFooter = ({ selectedUserId, chatId, handleSentMessage }) => {
   const { socket } = useContext(SocketContext);
+  const { user } = useContext(UserContext);
+
+  const [message, setMessage] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,15 +17,15 @@ const ChatFooter = ({ selectedSocketID }) => {
     if (message.trim()) {
       const messageData = {
         text: message,
-        id: nanoid(),
-        fromSelf: true,
+        fromUserId: user._id,
+        chat_id: chatId,
       };
 
-      handleNewMessage(messageData, selectedSocketID);
+      handleSentMessage(messageData);
 
       socket.emit("privateMessage", {
         message: messageData,
-        to: selectedSocketID,
+        to: selectedUserId,
       });
       setMessage("");
     }
