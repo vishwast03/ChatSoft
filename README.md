@@ -6,7 +6,7 @@
 
 ### Description
 
-A real-time multi-client chat application where multiple users can chat with each other. It includes a private messaging feature with full database support to save messages. It is built using Socket.IO, React, Node.js, and MongoDB.
+A real-time multi-client chat application where multiple users can chat with each other. It includes a **private messaging** feature with full database support to save messages. It is built using Socket.IO, React, Node.js, and MongoDB.
 
 ## Set up Project
 
