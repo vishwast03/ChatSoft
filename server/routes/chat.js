@@ -79,4 +79,34 @@ router.post(
   }
 );
 
+// ROUTE 3: Fetch all chats using: GET "/chat/fetchall" - Login required
+router.get("/fetchall", fetchUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    const allChats = await Promise.all(
+      user.chats.map(async (chat) => {
+        const chatUser = await User.findById(chat.user_id).select(
+          "fullname email isConnected"
+        );
+
+        const lastMessage = await Message.findById(chat.lastMessage);
+
+        return {
+          _id: chat._id,
+          user_id: chat.user_id,
+          fullname: chatUser.fullname,
+          email: chatUser.email,
+          isConnected: chatUser.isConnected,
+          lastMessage,
+        };
+      })
+    );
+
+    res.status(200).json({ success: true, chats: allChats });
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  }
+});
+
 module.exports = router;
