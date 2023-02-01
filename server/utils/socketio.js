@@ -4,6 +4,16 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const Message = require("../models/message");
 
+const saveLastMessage = async (userId, lastMessage) => {
+  const user = await User.findById(userId);
+  user.chats.forEach((chat) => {
+    if (chat._id === lastMessage.chat_id) {
+      chat.lastMessage = lastMessage._id;
+    }
+  });
+  user.save();
+};
+
 const handleSocketIO = (server) => {
   const io = new Server(server, {
     cors: {
@@ -25,7 +35,7 @@ const handleSocketIO = (server) => {
       user.save();
     });
 
-    socket.on("privateMessage", ({ message, to }) => {
+    socket.on("privateMessage", async ({ message, to }) => {
       const newMessage = {
         _id: `msg_${new mongoose.Types.ObjectId().toString()}`,
         ...message,
@@ -33,6 +43,9 @@ const handleSocketIO = (server) => {
       socket.to(to).emit("privateMessageResponse", { message: newMessage });
 
       Message.create(newMessage);
+
+      saveLastMessage(socket.data.userId, newMessage);
+      saveLastMessage(to, newMessage);
     });
 
     socket.on("disconnect", async () => {
